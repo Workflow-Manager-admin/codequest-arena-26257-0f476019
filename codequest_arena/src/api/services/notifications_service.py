@@ -90,11 +90,12 @@ class NotificationsService:
         # Explicit step-by-step composition to avoid E501 violation
         detail_part1 = detail_prefix + detail_channel
         detail_part2 = detail_middle + detail_to
-        detail = (
-            detail_part1
-            + detail_part2
-            + "."
-        )
+        # Line length fix for E501
+        # E501: explicit split so no line > 100 characters
+        # Conform to E501 (line <= 100 chars) and W504 (break before +)
+        detail = detail_part1
+        detail += detail_part2
+        detail += "."
         return NotificationResponseDTO(
             success=True,
             channel=channel,

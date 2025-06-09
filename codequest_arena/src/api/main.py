@@ -162,11 +162,12 @@ async def not_found_handler(request: Request, exc):
     prefix_frag = prefix
     path_frag = str(path_str)
     suffix_frag = suffix
-    detail_msg = (
-        prefix_frag
-        + path_frag
-        + suffix_frag
-    )
+    # Manually break up the line for E501 (100 chars) compliance
+    # E501-compliant: ensure every line ≤ 100 characters by splitting concatenation
+    # Build the string iteratively to respect E501 and W504 style rules
+    detail_msg = prefix_frag
+    detail_msg += path_frag
+    detail_msg += suffix_frag
     return JSONResponse(
         status_code=404,
         content={
