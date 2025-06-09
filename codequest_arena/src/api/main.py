@@ -16,18 +16,19 @@ the backend for all declared features:
 Extend individual feature routers in `api/routes/` as needed.
 """
 
-
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.requests import Request
 from typing import Dict
 
+from .routes import pr
+
 # PUBLIC_INTERFACE
+
+
 def get_settings() -> Dict[str, str]:
     """Returns settings/config for theming and global config."""
-
     # In the future, load from env file/config management
     return {
         "theme": "dark",
@@ -42,14 +43,13 @@ def get_settings() -> Dict[str, str]:
 app = FastAPI(
     title="CodeQuest Arena Backend",
     description=(
-        "Backend core for CodeQuest Arena with modular API endpoints for all "
-        "supported features."
+        "Backend core for CodeQuest Arena with modular API endpoints "
+        "for all supported features."
     ),
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
-
 
 # CORS across all endpoints for ease of local frontend dev; restrict in production!
 app.add_middleware(
@@ -60,8 +60,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Health check endpoint
+
+
 # PUBLIC_INTERFACE
 @app.get("/")
 async def health_check():
@@ -70,6 +71,7 @@ async def health_check():
 
 
 # PUBLIC_INTERFACE
+
 @app.get("/config/theme")
 async def get_theme_config():
     """
@@ -79,14 +81,15 @@ async def get_theme_config():
 
 
 # ----- Stubs for future modular routers -----
-# Example: from .routes import pr, rule_engine, bugs, dispute, gamification, redeem, analytics, notifications, security
+app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
+# Example: from .routes import rule_engine, bugs, dispute, gamification, redeem, analytics, notifications, security
 # Example inclusion (when files exist):
-# app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
 # app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
 # ...
 
 
 # PUBLIC_INTERFACE
+
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     """Custom 404 error handler."""
@@ -102,6 +105,7 @@ async def not_found_handler(request: Request, exc):
 
 
 # PUBLIC_INTERFACE
+
 @app.get("/features")
 async def list_features():
     """
@@ -115,55 +119,26 @@ async def list_features():
                 "name": "PR Integration & Repository Management",
                 "enabled": True
             },
-            {
-                "name": "Rule Engine",
-                "enabled": True
-            },
-            {
-                "name": "Bug Logging & Peer Review",
-                "enabled": True
-            },
-            {
-                "name": "Dispute Resolution Workflow",
-                "enabled": True
-            },
-            {
-                "name": "Gamification Engine",
-                "enabled": True
-            },
-            {
-                "name": "Redeem Center",
-                "enabled": True
-            },
-            {
-                "name": "Analytics Dashboard",
-                "enabled": True
-            },
-            {
-                "name": "Glassy UI & UX Design",
-                "enabled": True
-            },
-            {
-                "name": "Notifications & Integrations",
-                "enabled": True
-            },
-            {
-                "name": (
-                    "Security & Fairness Mechanisms"
-                ),
-                "enabled": True
-            }
+            {"name": "Rule Engine", "enabled": True},
+            {"name": "Bug Logging & Peer Review", "enabled": True},
+            {"name": "Dispute Resolution Workflow", "enabled": True},
+            {"name": "Gamification Engine", "enabled": True},
+            {"name": "Redeem Center", "enabled": True},
+            {"name": "Analytics Dashboard", "enabled": True},
+            {"name": "Glassy UI & UX Design", "enabled": True},
+            {"name": "Notifications & Integrations", "enabled": True},
+            {"name": "Security & Fairness Mechanisms", "enabled": True},
         ]
     }
 
 
-
 # PUBLIC_INTERFACE
+
 @app.get("/status")
 async def status():
     """Extended system status endpoint."""
     return {
         "status": "ok",
         "theme": get_settings()["theme"],
-        "app_version": app.version
+        "app_version": app.version,
     }
