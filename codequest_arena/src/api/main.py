@@ -24,6 +24,7 @@ from typing import Dict
 
 from .routes import pr
 from .routes import rule_engine
+from .routes import bug
 
 # PUBLIC_INTERFACE
 
@@ -84,6 +85,7 @@ async def get_theme_config():
 # ----- Stubs for future modular routers -----
 app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
 app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
+app.include_router(bug.router, prefix="/bug", tags=["Bug Logging & Peer Review"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
@@ -97,8 +99,9 @@ async def not_found_handler(request: Request, exc):
         status_code=404,
         content={
             "detail": (
-                f"Path '{request.url.path}' not found in "
-                "CodeQuest Arena API."
+                "Path '"
+                + str(request.url.path)
+                + "' not found in CodeQuest Arena API."
             )
         },
     )

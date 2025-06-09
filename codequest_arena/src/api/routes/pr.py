@@ -115,4 +115,3 @@ def get_pull_request(
             detail="PR not found"
         )
     return pr
-
