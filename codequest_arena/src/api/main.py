@@ -25,6 +25,7 @@ from typing import Dict
 from .routes import pr
 from .routes import rule_engine
 from .routes import bug
+from .routes import gamification
 
 # PUBLIC_INTERFACE
 
@@ -86,6 +87,7 @@ async def get_theme_config():
 app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
 app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
 app.include_router(bug.router, prefix="/bug", tags=["Bug Logging & Peer Review"])
+app.include_router(gamification.router, prefix="/gamification", tags=["Gamification Engine"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
@@ -122,15 +124,42 @@ async def list_features():
                 "name": "PR Integration & Repository Management",
                 "enabled": True
             },
-            {"name": "Rule Engine", "enabled": True},
-            {"name": "Bug Logging & Peer Review", "enabled": True},
-            {"name": "Dispute Resolution Workflow", "enabled": True},
-            {"name": "Gamification Engine", "enabled": True},
-            {"name": "Redeem Center", "enabled": True},
-            {"name": "Analytics Dashboard", "enabled": True},
-            {"name": "Glassy UI & UX Design", "enabled": True},
-            {"name": "Notifications & Integrations", "enabled": True},
-            {"name": "Security & Fairness Mechanisms", "enabled": True},
+            {
+                "name": "Rule Engine",
+                "enabled": True
+            },
+            {
+                "name": "Bug Logging & Peer Review",
+                "enabled": True
+            },
+            {
+                "name": "Dispute Resolution Workflow",
+                "enabled": True
+            },
+            {
+                "name": "Gamification Engine",
+                "enabled": True
+            },
+            {
+                "name": "Redeem Center",
+                "enabled": True
+            },
+            {
+                "name": "Analytics Dashboard",
+                "enabled": True
+            },
+            {
+                "name": "Glassy UI & UX Design",
+                "enabled": True
+            },
+            {
+                "name": "Notifications & Integrations",
+                "enabled": True
+            },
+            {
+                "name": "Security & Fairness Mechanisms",
+                "enabled": True
+            }
         ]
     }
 
