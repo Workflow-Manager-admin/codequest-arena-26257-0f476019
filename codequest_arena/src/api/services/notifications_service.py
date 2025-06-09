@@ -53,7 +53,9 @@ class NotificationHistoryRecord(BaseModel):
     to: str
     message: str
     meta: Optional[Dict[str, Any]]
-    sent_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    sent_at: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow
+    )
 
 
 # PUBLIC_INTERFACE
@@ -67,48 +69,45 @@ class NotificationsService:
 
     # PUBLIC_INTERFACE
     def send_notification(
-        self, channel: NotificationChannel, to: str, message: str, meta: Optional[Dict[str, Any]] = None
+        self,
+        channel: NotificationChannel,
+        to: str,
+        message: str,
+        meta: Optional[Dict[str, Any]] = None,
     ) -> NotificationResponseDTO:
         """
         Simulate notification delivery to the given channel.
         """
-        # Avoid E501: break after some arguments
-        # E501: break arguments so all lines <= 100 chars
         record = NotificationHistoryRecord(
             channel=channel,
             to=to,
             message=message,
-            meta=meta
+            meta=meta,
         )
         with self._lock:
             self._history.append(record)
-        # Simulate delivery (in real code, would send network requests)
-        # Compose detail without exceeding 100 chars
+        # Compose detail parts, break to keep lines < 100 chars
         detail_prefix = "Simulated "
         detail_channel = str(channel.value)
         detail_middle = " notification sent to "
         detail_to = str(to)
-        # Compose detail in smaller pieces to avoid E501
         detail_part1 = detail_prefix + detail_channel
         detail_part2 = detail_middle + detail_to
-        # Add period and keep all lines below 100 chars
-        detail = (
-            detail_part1
-            + detail_part2
-            + "."
-        )
-        # Ensure no line exceeds 100 characters (E501)
-        # The above parts are short, so total line will be <100
-
-        # Ensure no line in this file exceeds 100 characters (E501)
-        # Compose detail string in small fragments, use + for potential long output
-        # Manually compose "detail" to ensure no code line is >100 chars (E501), breaking at line end
+        detail = detail_part1 + detail_part2 + "."
+        if len(detail) > 100:
+            # Compose with breaks
+            detail = (
+                detail_part1
+                + "\n"
+                + detail_part2
+                + "."
+            )
         return NotificationResponseDTO(
             success=True,
             channel=channel,
             to=to,
             detail=detail,
-            sent_at=datetime.datetime.utcnow()
+            sent_at=datetime.datetime.utcnow(),
         )
 
     # PUBLIC_INTERFACE
@@ -123,21 +122,45 @@ class NotificationsService:
 
     # PUBLIC_INTERFACE
     def send_slack(
-        self, to: str, message: str, meta: Optional[dict] = None
+        self,
+        to: str,
+        message: str,
+        meta: Optional[dict] = None,
     ) -> NotificationResponseDTO:
-        return self.send_notification(NotificationChannel.SLACK, to, message, meta)
+        return self.send_notification(
+            NotificationChannel.SLACK,
+            to,
+            message,
+            meta,
+        )
 
     # PUBLIC_INTERFACE
     def send_discord(
-        self, to: str, message: str, meta: Optional[dict] = None
+        self,
+        to: str,
+        message: str,
+        meta: Optional[dict] = None,
     ) -> NotificationResponseDTO:
-        return self.send_notification(NotificationChannel.DISCORD, to, message, meta)
+        return self.send_notification(
+            NotificationChannel.DISCORD,
+            to,
+            message,
+            meta,
+        )
 
     # PUBLIC_INTERFACE
     def send_email(
-        self, to: str, message: str, meta: Optional[dict] = None
+        self,
+        to: str,
+        message: str,
+        meta: Optional[dict] = None,
     ) -> NotificationResponseDTO:
-        return self.send_notification(NotificationChannel.EMAIL, to, message, meta)
+        return self.send_notification(
+            NotificationChannel.EMAIL,
+            to,
+            message,
+            meta,
+        )
 
     # --- Integration Stubs ---
 
@@ -146,18 +169,30 @@ class NotificationsService:
         """
         Stub out Jira integration (simulate linking/creation of issue or update).
         """
-        return {"success": True, "detail": "Simulated Jira integration", "payload": payload}
+        return {
+            "success": True,
+            "detail": "Simulated Jira integration",
+            "payload": payload,
+        }
 
     # PUBLIC_INTERFACE
     def notify_trello(self, payload: dict) -> dict:
         """
         Stub out Trello integration (simulate card creation or update).
         """
-        return {"success": True, "detail": "Simulated Trello integration", "payload": payload}
+        return {
+            "success": True,
+            "detail": "Simulated Trello integration",
+            "payload": payload,
+        }
 
     # PUBLIC_INTERFACE
     def notify_asana(self, payload: dict) -> dict:
         """
         Stub out Asana integration (simulate task creation or comment).
         """
-        return {"success": True, "detail": "Simulated Asana integration", "payload": payload}
+        return {
+            "success": True,
+            "detail": "Simulated Asana integration",
+            "payload": payload,
+        }

@@ -176,9 +176,9 @@ async def not_found_handler(request: Request, exc):
     # Compose detail_string and wrap to avoid any line > 100 chars (E501 compliant)
     # Compose and wrap at code level to avoid >100 char line, fixing W504 and E501 strictly
     detail_string = (
-        prefix_frag +
-        path_frag +
-        suffix_frag
+        prefix_frag
+        + path_frag
+        + suffix_frag
     )
     # Compose with string parts to ensure no source line exceeds 100
     if len(detail_string) > 100:
@@ -186,13 +186,15 @@ async def not_found_handler(request: Request, exc):
         s2 = path_frag[:40]
         s3 = path_frag[40:80]
         s4 = path_frag[80:]
-        # assemble parts and manually split, keeping binary op at line end for W504
+        # assemble parts and manually split, keeping binary op at line start for W504 compliance
         detail_string = (
-            s1 + s2 +
-            ("\n" if s3 or s4 else "") +
-            s3 +
-            ("\n" if s4 else "") +
-            s4 + suffix_frag
+            s1
+            + s2
+            + ("\n" if s3 or s4 else "")
+            + s3
+            + ("\n" if s4 else "")
+            + s4
+            + suffix_frag
         )
     # Hard wrap long string for linter
     if len(detail_string) > 100:
@@ -200,7 +202,9 @@ async def not_found_handler(request: Request, exc):
         midpoint = max(10, 100 - len(prefix_frag) - len(suffix_frag))
         part1 = path_frag[:midpoint]
         part2 = path_frag[midpoint:] if len(path_frag) > midpoint else ""
-        detail_string = prefix_frag + part1 + ("\\\n" if part2 else "") + part2 + suffix_frag
+        detail_string = (
+            prefix_frag + part1 + ("\\\n" if part2 else "") + part2 + suffix_frag
+        )
     return JSONResponse(
         status_code=404,
         content={"detail": detail_string},
@@ -218,7 +222,9 @@ async def list_features():
     return {
         "features": [
             {
-                "name": "PR Integration & Repository Management",
+                "name": (
+                    "PR Integration & Repository Management"
+                ),
                 "enabled": True,
             },
             {
@@ -254,7 +260,9 @@ async def list_features():
                 "enabled": True,
             },
             {
-                "name": "Security & Fairness Mechanisms",
+                "name": (
+                    "Security & Fairness Mechanisms"
+                ),
                 "enabled": True,
             }
         ]
@@ -268,5 +276,7 @@ async def status():
     return {
         "status": "ok",
         "theme": get_settings()["theme"],
-        "app_version": app.version,
+        "app_version": (
+            app.version
+        ),
     }
