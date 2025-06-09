@@ -28,6 +28,7 @@ from .routes import bug
 from .routes import gamification
 from .routes import redeem_center
 from .routes import analytics
+from .routes import notifications
 
 # PUBLIC_INTERFACE
 
@@ -98,8 +99,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Health check endpoint
 
+# Health check endpoint
 
 # PUBLIC_INTERFACE
 @app.get("/")
@@ -109,7 +110,6 @@ async def health_check():
 
 
 # PUBLIC_INTERFACE
-
 @app.get("/config/theme")
 async def get_theme_config():
     """
@@ -144,12 +144,12 @@ app.include_router(bug.router, prefix="/bug", tags=["Bug Logging & Peer Review"]
 app.include_router(gamification.router, prefix="/gamification", tags=["Gamification Engine"])
 app.include_router(redeem_center.router, prefix="/redeem", tags=["Redeem Center"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
+app.include_router(notifications.router, prefix="/integrations", tags=["Notifications & Integrations"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
 
 # PUBLIC_INTERFACE
-
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     """Custom 404 error handler."""
@@ -166,7 +166,6 @@ async def not_found_handler(request: Request, exc):
 
 
 # PUBLIC_INTERFACE
-
 @app.get("/features")
 async def list_features():
     """
@@ -221,7 +220,6 @@ async def list_features():
 
 
 # PUBLIC_INTERFACE
-
 @app.get("/status")
 async def status():
     """Extended system status endpoint."""
