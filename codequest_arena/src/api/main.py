@@ -29,10 +29,10 @@ from .routes import gamification
 from .routes import redeem_center
 from .routes import analytics
 from .routes import notifications
+from .routes import security
+
 
 # PUBLIC_INTERFACE
-
-
 def get_settings() -> Dict[str, str]:
     """Returns settings/config for theming and global config (including glassy meta)."""
     # In the future, load from env file/config management
@@ -145,6 +145,7 @@ app.include_router(gamification.router, prefix="/gamification", tags=["Gamificat
 app.include_router(redeem_center.router, prefix="/redeem", tags=["Redeem Center"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 app.include_router(notifications.router, prefix="/integrations", tags=["Notifications & Integrations"])
+app.include_router(security.router, prefix="", tags=["Security & Fairness"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
@@ -153,9 +154,12 @@ app.include_router(notifications.router, prefix="/integrations", tags=["Notifica
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     """Custom 404 error handler."""
+    path_str = str(request.url.path)
+    # E501 compliant, no line exceeds 100 chars
     detail_msg = (
-        "Path '" + str(request.url.path) +
-        "' not found in CodeQuest Arena API."
+        "Path '"
+        + path_str
+        + "' not found in CodeQuest Arena API."
     )
     return JSONResponse(
         status_code=404,

@@ -81,6 +81,7 @@ class NotificationsService:
         with self._lock:
             self._history.append(record)
         # Simulate delivery (in real code, would send network requests)
+        # Compose detail without exceeding 100 chars
         detail = (
             f"Simulated {channel.value} notification sent to {to}."
         )
