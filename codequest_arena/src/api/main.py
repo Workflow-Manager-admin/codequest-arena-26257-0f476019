@@ -30,6 +30,7 @@ from .routes import redeem_center
 from .routes import analytics
 from .routes import notifications
 from .routes import security
+from .routes import auth
 
 
 # PUBLIC_INTERFACE
@@ -156,6 +157,7 @@ app.include_router(
     tags=["Notifications & Integrations"]
 )
 app.include_router(security.router, prefix="", tags=["Security & Fairness"])
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
@@ -273,10 +275,11 @@ async def list_features():
 @app.get("/status")
 async def status():
     """Extended system status endpoint."""
+    # E501: ensure no single line > 100 chars by splitting up dict values and breaking long lines.
+    theme = get_settings()["theme"]
+    app_version = app.version
     return {
         "status": "ok",
-        "theme": get_settings()["theme"],
-        "app_version": (
-            app.version
-        ),
+        "theme": theme,
+        "app_version": app_version,
     }

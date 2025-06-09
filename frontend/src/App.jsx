@@ -10,8 +10,22 @@ import Rules from './pages/Rules';
 import Analytics from './pages/Analytics';
 import Gamification from './pages/Gamification';
 import RedeemCenter from './pages/RedeemCenter';
+import Login from './pages/Login';
+import { useAuth } from './hooks/useAuth';
+
+function AuthWrapper({ children }) {
+  // Very simple route auth guard for the demo
+  const auth = useAuth();
+  if (!auth.isAuthenticated) {
+    window.location.href = "/login";
+    return null;
+  }
+  return children;
+}
 
 export default function App() {
+  const auth = useAuth();
+
   return (
     <Router>
       <div className="glass-app-shell">
@@ -36,15 +50,52 @@ export default function App() {
           <Link to="/analytics">Analytics</Link>
           <Link to="/gamification">Gamification</Link>
           <Link to="/redeem">Redeem Center</Link>
+          {/* Spacer */}
+          <span style={{ flex: 1 }} />
+          {auth.isAuthenticated ? (
+            <>
+              <span style={{ color: "#26ffb8", fontWeight: 500 }}>{auth.username}</span>
+              <button
+                onClick={auth.logout}
+                style={{
+                  background: "#181d24",
+                  color: "#ff4545",
+                  border: 0,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  padding: "4px 16px",
+                  borderRadius: 8,
+                  marginLeft: 10,
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              style={{
+                background: "#00eaff",
+                color: "#181d24",
+                padding: "4px 18px",
+                borderRadius: 8,
+                fontWeight: 600,
+                marginLeft: 8,
+              }}
+            >
+              Login
+            </Link>
+          )}
         </nav>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/prs" element={<PRDashboard />} />
-          <Route path="/bugs" element={<BugPanel />} />
-          <Route path="/rules" element={<Rules />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/gamification" element={<Gamification />} />
-          <Route path="/redeem" element={<RedeemCenter />} />
+          <Route path="/" element={<AuthWrapper><Dashboard /></AuthWrapper>} />
+          <Route path="/prs" element={<AuthWrapper><PRDashboard /></AuthWrapper>} />
+          <Route path="/bugs" element={<AuthWrapper><BugPanel /></AuthWrapper>} />
+          <Route path="/rules" element={<AuthWrapper><Rules /></AuthWrapper>} />
+          <Route path="/analytics" element={<AuthWrapper><Analytics /></AuthWrapper>} />
+          <Route path="/gamification" element={<AuthWrapper><Gamification /></AuthWrapper>} />
+          <Route path="/redeem" element={<AuthWrapper><RedeemCenter /></AuthWrapper>} />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
