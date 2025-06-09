@@ -26,6 +26,7 @@ from .routes import pr
 from .routes import rule_engine
 from .routes import bug
 from .routes import gamification
+from .routes import redeem_center
 
 # PUBLIC_INTERFACE
 
@@ -88,6 +89,7 @@ app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
 app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
 app.include_router(bug.router, prefix="/bug", tags=["Bug Logging & Peer Review"])
 app.include_router(gamification.router, prefix="/gamification", tags=["Gamification Engine"])
+app.include_router(redeem_center.router, prefix="/redeem", tags=["Redeem Center"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
@@ -97,14 +99,14 @@ app.include_router(gamification.router, prefix="/gamification", tags=["Gamificat
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     """Custom 404 error handler."""
+    detail_msg = (
+        "Path '" + str(request.url.path) +
+        "' not found in CodeQuest Arena API."
+    )
     return JSONResponse(
         status_code=404,
         content={
-            "detail": (
-                "Path '"
-                + str(request.url.path)
-                + "' not found in CodeQuest Arena API."
-            )
+            "detail": detail_msg
         },
     )
 

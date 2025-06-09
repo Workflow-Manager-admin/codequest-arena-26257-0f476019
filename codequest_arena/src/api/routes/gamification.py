@@ -52,14 +52,22 @@ def list_points_transactions(user_id: str):
 
 
 # PUBLIC_INTERFACE
-@router.get("/users/{user_id}/badges", response_model=List[BadgeDTO], tags=["Gamification Engine"])
+@router.get(
+    "/users/{user_id}/badges",
+    response_model=List[BadgeDTO],
+    tags=["Gamification Engine"]
+)
 def list_badges(user_id: str):
     """Lists all badges earned by a user."""
     return service.list_badges(user_id)
 
 
 # PUBLIC_INTERFACE
-@router.get("/users/{user_id}/level", response_model=Optional[LevelDTO], tags=["Gamification Engine"])
+@router.get(
+    "/users/{user_id}/level",
+    response_model=Optional[LevelDTO],
+    tags=["Gamification Engine"]
+)
 def get_level(user_id: str):
     """Returns the user's level/rank."""
     return service.get_level(user_id)
@@ -101,7 +109,11 @@ class AwardAchievementRequest(BaseModel):
 
 
 # PUBLIC_INTERFACE
-@router.post("/admin/award/points", response_model=PointsTransactionDTO, tags=["Gamification Engine"])
+@router.post(
+    "/admin/award/points",
+    response_model=PointsTransactionDTO,
+    tags=["Gamification Engine"]
+)
 def admin_award_points(req: AwardPointsRequest):
     """ADMIN: Award points to a user for a reason."""
     tx = service.award_points(req.user_id, req.points, req.reason, meta=req.meta)
@@ -110,7 +122,11 @@ def admin_award_points(req: AwardPointsRequest):
 
 
 # PUBLIC_INTERFACE
-@router.post("/admin/award/badge", response_model=BadgeDTO, tags=["Gamification Engine"])
+@router.post(
+    "/admin/award/badge",
+    response_model=BadgeDTO,
+    tags=["Gamification Engine"]
+)
 def admin_award_badge(req: AwardBadgeRequest):
     """ADMIN: Award a badge to a user."""
     return service.award_badge(req.user_id, req.type, req.meta)
