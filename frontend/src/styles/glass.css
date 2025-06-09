@@ -64,4 +64,11 @@ body {
   box-shadow: 0 0 24px 0 var(--highlight);
 }
 
+/* Disabled glass card (for API-powered feature status display) */
+.glass-disabled {
+  opacity: 0.6;
+  filter: grayscale(40%);
+  pointer-events: none;
+}
+
 /* TODO: More glassy utility classes, animations, transitions */

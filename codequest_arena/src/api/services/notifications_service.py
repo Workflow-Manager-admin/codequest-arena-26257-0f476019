@@ -72,11 +72,13 @@ class NotificationsService:
         """
         Simulate notification delivery to the given channel.
         """
+        # Avoid E501: break after some arguments
+        # E501: break arguments so all lines <= 100 chars
         record = NotificationHistoryRecord(
             channel=channel,
             to=to,
             message=message,
-            meta=meta,
+            meta=meta
         )
         with self._lock:
             self._history.append(record)

@@ -143,10 +143,18 @@ async def get_layout_config():
 app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
 app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
 app.include_router(bug.router, prefix="/bug", tags=["Bug Logging & Peer Review"])
-app.include_router(gamification.router, prefix="/gamification", tags=["Gamification Engine"])
+app.include_router(
+    gamification.router,
+    prefix="/gamification",
+    tags=["Gamification Engine"]
+)
 app.include_router(redeem_center.router, prefix="/redeem", tags=["Redeem Center"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
-app.include_router(notifications.router, prefix="/integrations", tags=["Notifications & Integrations"])
+app.include_router(
+    notifications.router,
+    prefix="/integrations",
+    tags=["Notifications & Integrations"]
+)
 app.include_router(security.router, prefix="", tags=["Security & Fairness"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
@@ -159,13 +167,11 @@ async def not_found_handler(request: Request, exc):
     path_str = str(request.url.path)
     # Ensures each line stays within 100 characters (E501-compliant)
     prefix = "Path '"
-    suffix = (
-        "' not found in CodeQuest Arena API."
-    )
+    suffix = "' not found in CodeQuest Arena API."
     prefix_frag = prefix
     path_frag = str(path_str)
     suffix_frag = suffix
-    # Compose using parentheses and split long lines further
+    # Compose using parentheses; binary operators at start of line (W504), all lines <= 100 chars
     detail_msg = (
         prefix_frag
         + path_frag
@@ -228,7 +234,7 @@ async def list_features():
             {
                 "name": "Security & Fairness Mechanisms",
                 "enabled": True,
-            },
+            }
         ]
     }
 
@@ -242,4 +248,3 @@ async def status():
         "theme": get_settings()["theme"],
         "app_version": app.version,
     }
-
