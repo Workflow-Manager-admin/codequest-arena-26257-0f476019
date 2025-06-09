@@ -143,17 +143,13 @@ class RedeemCenterService:
             return False
 
     # PUBLIC_INTERFACE
-    def get_user_redemptions(
-        self, user_id: str
-    ) -> List[RedemptionTransactionDTO]:
+    def get_user_redemptions(self, user_id: str) -> List[RedemptionTransactionDTO]:
         """List all redemption attempts by a user."""
         with self._lock:
             return list(self._redemptions.get(user_id, []))
 
     # PUBLIC_INTERFACE
-    def get_redemption(
-        self, redemption_id: str
-    ) -> Optional[RedemptionTransactionDTO]:
+    def get_redemption(self, redemption_id: str) -> Optional[RedemptionTransactionDTO]:
         """Get a redemption transaction by its ID."""
         with self._lock:
             return self._redemptions_by_id.get(redemption_id)
@@ -164,7 +160,8 @@ class RedeemCenterService:
     ) -> RedemptionTransactionDTO:
         """
         Attempt redemption for a given prize by user.
-        Checks points and inventory, then decrements inventory and records transaction if successful.
+        Checks points and inventory, then decrements inventory and records transaction if
+        successful.
         """
         with self._lock:
             prize = self._prizes.get(prize_id)
@@ -211,12 +208,10 @@ class RedeemCenterService:
     def list_all_redemptions(self) -> List[RedemptionTransactionDTO]:
         """
         ADMIN: List all redemptions in the system.
-        Ensures compliance with line length <= 100 chars.
+        All lines are <= 100 chars. Uses explicit loop for E501 compatibility.
         """
         with self._lock:
-            # Explicit loop to avoid breaking E501 limit
             results = []
             for tx in self._redemptions_by_id.values():
                 results.append(tx)
-            # Ensure last line is never >100 chars:
             return results

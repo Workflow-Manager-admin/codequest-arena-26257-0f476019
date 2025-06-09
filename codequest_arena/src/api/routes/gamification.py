@@ -146,7 +146,11 @@ def admin_award_achievement(req: AwardAchievementRequest):
 
 
 # PUBLIC_INTERFACE
-@router.post("/admin/level/recompute/{user_id}", response_model=LevelDTO, tags=["Gamification Engine"])
+@router.post(
+    "/admin/level/recompute/{user_id}",
+    response_model=LevelDTO,
+    tags=["Gamification Engine"],
+)
 def admin_recompute_level(user_id: str):
     """ADMIN: Force recompute user's level/rank based on current points."""
     return service.update_level(user_id)

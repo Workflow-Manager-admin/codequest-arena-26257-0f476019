@@ -27,6 +27,7 @@ from .routes import rule_engine
 from .routes import bug
 from .routes import gamification
 from .routes import redeem_center
+from .routes import analytics
 
 # PUBLIC_INTERFACE
 
@@ -90,6 +91,7 @@ app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
 app.include_router(bug.router, prefix="/bug", tags=["Bug Logging & Peer Review"])
 app.include_router(gamification.router, prefix="/gamification", tags=["Gamification Engine"])
 app.include_router(redeem_center.router, prefix="/redeem", tags=["Redeem Center"])
+app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 # Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
@@ -124,44 +126,44 @@ async def list_features():
         "features": [
             {
                 "name": "PR Integration & Repository Management",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Rule Engine",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Bug Logging & Peer Review",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Dispute Resolution Workflow",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Gamification Engine",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Redeem Center",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Analytics Dashboard",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Glassy UI & UX Design",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Notifications & Integrations",
-                "enabled": True
+                "enabled": True,
             },
             {
                 "name": "Security & Fairness Mechanisms",
-                "enabled": True
-            }
+                "enabled": True,
+            },
         ]
     }
 
