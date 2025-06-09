@@ -20,7 +20,7 @@ npm install
 npm run dev
 ```
 
-The app will run locally at [http://localhost:5173](http://localhost:5173) (default Vite port).
+The app will run locally at [http://localhost:3000](http://localhost:3000) (default Vite port).
 
 ---
 

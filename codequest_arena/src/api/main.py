@@ -224,10 +224,10 @@ async def list_features():
     return {
         "features": [
             {
-                "name": (
-                    "PR Integration & Repository Management"
-                ),
-                "enabled": True,
+                "name":
+                    "PR Integration & Repo Management",
+                "enabled":
+                    True,
             },
             {
                 "name": "Rule Engine",
@@ -263,7 +263,8 @@ async def list_features():
             },
             {
                 "name": (
-                    "Security & Fairness Mechanisms"
+                    "Security & Fairness "
+                    "Mechanisms"
                 ),
                 "enabled": True,
             }
