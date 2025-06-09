@@ -82,20 +82,25 @@ class NotificationsService:
             self._history.append(record)
         # Simulate delivery (in real code, would send network requests)
         # Compose detail without exceeding 100 chars
-        # E501-compliant: wrap string formatting if necessary
-        # E501-compliant: break the f-string across two lines
-        # E501-compliant: put each element on a separate line
-        # E501-compliant: assign fragments, then join
         detail_prefix = "Simulated "
         detail_channel = str(channel.value)
         detail_middle = " notification sent to "
         detail_to = str(to)
-        detail = detail_prefix + detail_channel + detail_middle + detail_to + "."
+        # Break up into multiple lines for E501 compliance
+        # Explicit step-by-step composition to avoid E501 violation
+        detail_part1 = detail_prefix + detail_channel
+        detail_part2 = detail_middle + detail_to
+        detail = (
+            detail_part1
+            + detail_part2
+            + "."
+        )
         return NotificationResponseDTO(
             success=True,
             channel=channel,
             to=to,
             detail=detail,
+            sent_at=datetime.datetime.utcnow()  # Explicit for clarity
         )
 
     # PUBLIC_INTERFACE

@@ -1,0 +1,67 @@
+/* Glassmorphism base styles for CodeQuest Arena */
+/* Theming via :root for easy palette swaps */
+
+:root {
+  --primary: #020d1d;
+  --secondary: #9CA3AF;
+  --accent: #013951;
+  --background: rgba(2,13,29,0.88);
+  --card-bg: rgba(21,30,48,0.47);
+  --frost: rgba(255,255,255,0.12);
+  --highlight: #00eaff;
+  --shadow: 0 4px 32px 4px rgba(2,13,29,0.11);
+  --border-radius: 20px;
+  --blur-px: 18px;
+  --border: 1.5px solid rgba(255,255,255,0.12);
+}
+
+body {
+  background: var(--background);
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--secondary);
+}
+
+.glass-app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* future: gradient background, animated neon border, etc */
+}
+
+.glass-card {
+  background: var(--card-bg);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(var(--blur-px));
+  -webkit-backdrop-filter: blur(var(--blur-px));
+  margin: 1rem;
+  padding: 2rem;
+  color: var(--secondary);
+}
+
+.dashboard-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.glass-card.dashboard {
+  margin: 2rem auto;
+  max-width: 900px;
+}
+
+.glass-card.notfound {
+  margin: 4rem auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Neon hover effect */
+.glass-card:hover {
+  border-color: var(--highlight);
+  box-shadow: 0 0 24px 0 var(--highlight);
+}
+
+/* TODO: More glassy utility classes, animations, transitions */

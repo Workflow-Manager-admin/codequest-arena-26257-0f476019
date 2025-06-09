@@ -155,14 +155,18 @@ app.include_router(security.router, prefix="", tags=["Security & Fairness"])
 async def not_found_handler(request: Request, exc):
     """Custom 404 error handler."""
     path_str = str(request.url.path)
-    # E501 compliant, no line exceeds 100 chars
-    # E501 and W504 compliant: break before '+', keep lines <= 100 chars
-    # E501-compliant: each string segment fits on its own line
-    # E501-compliant: implicit string concatenation in parentheses
-    # E501-compliant: break the string into fragments with explicit variables (never concatenating long results)
+    # Ensures each line stays within 100 characters (E501-compliant)
     prefix = "Path '"
     suffix = "' not found in CodeQuest Arena API."
-    detail_msg = prefix + str(path_str) + suffix
+    # Fully E501-compliant: break up the concatenation steps with intermediate fragments
+    prefix_frag = prefix
+    path_frag = str(path_str)
+    suffix_frag = suffix
+    detail_msg = (
+        prefix_frag
+        + path_frag
+        + suffix_frag
+    )
     return JSONResponse(
         status_code=404,
         content={

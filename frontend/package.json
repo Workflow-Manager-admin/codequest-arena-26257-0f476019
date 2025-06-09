@@ -1,0 +1,24 @@
+{
+  "name": "codequest-arena-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Frontend for CodeQuest Arena (React + Vite, glassmorphism UI)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext js,jsx"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.58.0",
+    "eslint-plugin-react": "^7.34.1",
+    "vite": "^4.4.9"
+  }
+}
