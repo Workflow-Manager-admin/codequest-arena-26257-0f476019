@@ -22,6 +22,7 @@ from ..services.pr_service import (
     PullRequestDTO,
 )
 
+
 router = APIRouter()
 
 # Service instance (would be DI-managed or cached in production)
@@ -60,7 +61,11 @@ def connect_to_provider(
 
 
 # PUBLIC_INTERFACE
-@router.get("/repositories", response_model=List[RepositoryDTO], tags=["PR Integration"])
+@router.get(
+    "/repositories",
+    response_model=List[RepositoryDTO],
+    tags=["PR Integration"]
+)
 def list_repositories(
     provider: GitProvider,
     user_token: str = Query(..., description="OAuth token for demo purposes"),
@@ -72,7 +77,11 @@ def list_repositories(
 
 
 # PUBLIC_INTERFACE
-@router.get("/repositories/{repo_id}/prs", response_model=List[PullRequestDTO], tags=["PR Integration"])
+@router.get(
+    "/repositories/{repo_id}/prs",
+    response_model=List[PullRequestDTO],
+    tags=["PR Integration"]
+)
 def list_pull_requests(
     provider: GitProvider,
     repo_id: str,
@@ -106,3 +115,4 @@ def get_pull_request(
             detail="PR not found"
         )
     return pr
+

@@ -23,6 +23,7 @@ from starlette.requests import Request
 from typing import Dict
 
 from .routes import pr
+from .routes import rule_engine
 
 # PUBLIC_INTERFACE
 
@@ -82,9 +83,8 @@ async def get_theme_config():
 
 # ----- Stubs for future modular routers -----
 app.include_router(pr.router, prefix="/pr", tags=["PR Integration"])
-# Example: from .routes import rule_engine, bugs, dispute, gamification, redeem, analytics, notifications, security
-# Example inclusion (when files exist):
-# app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
+app.include_router(rule_engine.router, prefix="/rules", tags=["Rule Engine"])
+# Example: from .routes import bugs, dispute, gamification, redeem, analytics, notifications, security
 # ...
 
 

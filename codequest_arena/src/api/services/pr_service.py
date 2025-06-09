@@ -19,6 +19,7 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel
 
+
 # PUBLIC_INTERFACE
 class GitProvider(str, Enum):
     github = "github"
