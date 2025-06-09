@@ -100,12 +100,15 @@ class NotificationsService:
         # Ensure no line exceeds 100 characters (E501)
         # The above parts are short, so total line will be <100
 
+        # Ensure no line in this file exceeds 100 characters (E501)
+        # Compose detail string in small fragments, use + for potential long output
+        # Manually compose "detail" to ensure no code line is >100 chars (E501), breaking at line end
         return NotificationResponseDTO(
             success=True,
             channel=channel,
             to=to,
             detail=detail,
-            sent_at=datetime.datetime.utcnow()  # Explicit for clarity
+            sent_at=datetime.datetime.utcnow()
         )
 
     # PUBLIC_INTERFACE

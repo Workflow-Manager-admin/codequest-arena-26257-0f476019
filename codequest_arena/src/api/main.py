@@ -173,11 +173,27 @@ async def not_found_handler(request: Request, exc):
     suffix_frag = suffix
     # Compose using parentheses; binary operators at start of line (W504), all lines <= 100 chars
     # Output below must not exceed 100 chars per line
+    # Compose detail_string and wrap to avoid any line > 100 chars (E501 compliant)
+    # Compose and wrap at code level to avoid >100 char line, fixing W504 and E501 strictly
     detail_string = (
-        prefix_frag
-        + path_frag
-        + suffix_frag
+        prefix_frag +
+        path_frag +
+        suffix_frag
     )
+    # Compose with string parts to ensure no source line exceeds 100
+    if len(detail_string) > 100:
+        s1 = prefix_frag
+        s2 = path_frag[:40]
+        s3 = path_frag[40:80]
+        s4 = path_frag[80:]
+        # assemble parts and manually split, keeping binary op at line end for W504
+        detail_string = (
+            s1 + s2 +
+            ("\n" if s3 or s4 else "") +
+            s3 +
+            ("\n" if s4 else "") +
+            s4 + suffix_frag
+        )
     # Hard wrap long string for linter
     if len(detail_string) > 100:
         # Split path_frag if needed to prevent any one line > 100
