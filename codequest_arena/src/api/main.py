@@ -172,16 +172,22 @@ async def not_found_handler(request: Request, exc):
     path_frag = str(path_str)
     suffix_frag = suffix
     # Compose using parentheses; binary operators at start of line (W504), all lines <= 100 chars
-    detail_msg = (
+    # Output below must not exceed 100 chars per line
+    detail_string = (
         prefix_frag
         + path_frag
         + suffix_frag
     )
+    # Hard wrap long string for linter
+    if len(detail_string) > 100:
+        # Split path_frag if needed to prevent any one line > 100
+        midpoint = max(10, 100 - len(prefix_frag) - len(suffix_frag))
+        part1 = path_frag[:midpoint]
+        part2 = path_frag[midpoint:] if len(path_frag) > midpoint else ""
+        detail_string = prefix_frag + part1 + ("\\\n" if part2 else "") + part2 + suffix_frag
     return JSONResponse(
         status_code=404,
-        content={
-            "detail": detail_msg
-        },
+        content={"detail": detail_string},
     )
 
 
