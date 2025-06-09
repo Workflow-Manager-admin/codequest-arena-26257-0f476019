@@ -90,6 +90,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+
 # CORS across all endpoints for ease of local frontend dev; restrict in production!
 app.add_middleware(
     CORSMiddleware,
@@ -101,6 +102,7 @@ app.add_middleware(
 
 
 # Health check endpoint
+
 
 # PUBLIC_INTERFACE
 @app.get("/")
@@ -157,17 +159,18 @@ async def not_found_handler(request: Request, exc):
     path_str = str(request.url.path)
     # Ensures each line stays within 100 characters (E501-compliant)
     prefix = "Path '"
-    suffix = "' not found in CodeQuest Arena API."
-    # Fully E501-compliant: break up the concatenation steps with intermediate fragments
+    suffix = (
+        "' not found in CodeQuest Arena API."
+    )
     prefix_frag = prefix
     path_frag = str(path_str)
     suffix_frag = suffix
-    # Manually break up the line for E501 (100 chars) compliance
-    # E501-compliant: ensure every line ≤ 100 characters by splitting concatenation
-    # Build the string iteratively to respect E501 and W504 style rules
-    detail_msg = prefix_frag
-    detail_msg += path_frag
-    detail_msg += suffix_frag
+    # Compose using parentheses and split long lines further
+    detail_msg = (
+        prefix_frag
+        + path_frag
+        + suffix_frag
+    )
     return JSONResponse(
         status_code=404,
         content={
@@ -239,3 +242,4 @@ async def status():
         "theme": get_settings()["theme"],
         "app_version": app.version,
     }
+

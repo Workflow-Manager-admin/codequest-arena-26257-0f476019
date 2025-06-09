@@ -86,16 +86,15 @@ class NotificationsService:
         detail_channel = str(channel.value)
         detail_middle = " notification sent to "
         detail_to = str(to)
-        # Break up into multiple lines for E501 compliance
-        # Explicit step-by-step composition to avoid E501 violation
+        # Compose detail stepwise; no line >100 chars (E501)
         detail_part1 = detail_prefix + detail_channel
         detail_part2 = detail_middle + detail_to
-        # Line length fix for E501
-        # E501: explicit split so no line > 100 characters
-        # Conform to E501 (line <= 100 chars) and W504 (break before +)
-        detail = detail_part1
-        detail += detail_part2
-        detail += "."
+        # Add period and keep all lines below 100 chars, using parentheses for concatenation
+        detail = (
+            detail_part1
+            + detail_part2
+            + "."
+        )
         return NotificationResponseDTO(
             success=True,
             channel=channel,
