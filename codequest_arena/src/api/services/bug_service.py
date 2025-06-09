@@ -49,6 +49,70 @@ class BugStatus(str, Enum):
 
 
 # PUBLIC_INTERFACE
+class DisputeStatus(str, Enum):
+    OPEN = "OPEN"
+    RESOLVED = "RESOLVED"
+    ADMIN_OVERRIDE = "ADMIN_OVERRIDE"
+    CANCELLED = "CANCELLED"
+    EXPIRED = "EXPIRED"
+
+
+# PUBLIC_INTERFACE
+class VoteChoice(str, Enum):
+    ACCEPT = "ACCEPT"      # Voter agrees with the bug as valid
+    REJECT = "REJECT"      # Voter sides with the dispute, i.e., bug is INVALID
+
+
+# PUBLIC_INTERFACE
+class VoteDTO(BaseModel):
+    vote_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    dispute_id: str
+    voter: str  # username or id
+    choice: VoteChoice
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "vote_id": "uuid-string",
+                "dispute_id": "dispute-uuid-string",
+                "voter": "peer-reviewer",
+                "choice": "REJECT",
+                "created_at": "2023-01-01T12:34:56Z"
+            }
+        }
+
+
+# PUBLIC_INTERFACE
+class DisputeDTO(BaseModel):
+    dispute_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    bug_id: str  # Which bug is being disputed
+    opened_by: str  # Who started the dispute (typically PR author)
+    reason: Optional[str]
+    status: DisputeStatus = DisputeStatus.OPEN
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    resolved_at: Optional[datetime.datetime] = None
+    resolved_by: Optional[str] = None  # username or id, peer or admin
+    resolution_notes: Optional[str] = None
+    result: Optional[VoteChoice] = None  # Final outcome ACCEPT/REJECT
+    votes: Optional[List[VoteDTO]] = None  # Votes for this dispute
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "dispute_id": "uuid-string",
+                "bug_id": "bug-uuid-string",
+                "opened_by": "pr-author",
+                "reason": "I believe this bug is not valid.",
+                "status": "OPEN",
+                "created_at": "2023-01-01T14:00:00Z",
+                "result": None,
+                "votes": []
+            }
+        }
+
+
+# PUBLIC_INTERFACE
 class BugDTO(BaseModel):
     """Data transfer object for a logged bug in PR."""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -86,12 +150,14 @@ class BugDTO(BaseModel):
 # PUBLIC_INTERFACE
 class BugService:
     """
-    Service for bug logging & peer review.
+    Service for bug logging & peer review and dispute resolution workflow.
     NOTE: In-memory storage for demonstration; swap with DB for production.
     """
     _lock = threading.Lock()
-    # Indexed as (repo_id, pr_id) -> List[BugDTO]
     _bugs_by_pr: Dict[str, List[BugDTO]] = {}
+    _disputes_by_bug: Dict[str, List[DisputeDTO]] = {}
+    _dispute_by_id: Dict[str, DisputeDTO] = {}
+    _votes_by_dispute: Dict[str, List[VoteDTO]] = {}
 
     def _make_pr_key(self, repo_id: str, pr_id: str) -> str:
         return f"{repo_id}::{pr_id}"
@@ -148,3 +214,135 @@ class BugService:
                         del bug_list[idx]
                         return True
         return False
+
+    # PUBLIC_INTERFACE
+    def open_dispute(
+        self, bug_id: str, opened_by: str, reason: Optional[str] = None
+    ) -> DisputeDTO:
+        """
+        Open a new dispute for a bug. Returns the created DisputeDTO.
+        Only one active (OPEN) dispute allowed at a time per bug.
+        """
+        with self._lock:
+            bug = self.get_bug(bug_id)
+            if not bug:
+                raise ValueError("Bug not found")
+            existing_open = [
+                d for d in self._disputes_by_bug.get(bug_id, [])
+                if d.status == DisputeStatus.OPEN
+            ]
+            if existing_open:
+                raise ValueError("A dispute is already open for this bug")
+            dispute = DisputeDTO(
+                bug_id=bug_id,
+                opened_by=opened_by,
+                reason=reason,
+                status=DisputeStatus.OPEN,
+                votes=[],
+            )
+            dispute_list = self._disputes_by_bug.setdefault(bug_id, [])
+            dispute_list.append(dispute)
+            self._dispute_by_id[dispute.dispute_id] = dispute
+            self._votes_by_dispute[dispute.dispute_id] = []
+            return dispute
+
+    # PUBLIC_INTERFACE
+    def list_disputes_for_bug(self, bug_id: str) -> List[DisputeDTO]:
+        """List all disputes for a bug (open and resolved)."""
+        with self._lock:
+            return list(self._disputes_by_bug.get(bug_id, []))
+
+    # PUBLIC_INTERFACE
+    def get_dispute(self, dispute_id: str) -> Optional[DisputeDTO]:
+        """Get a dispute by its ID."""
+        with self._lock:
+            dispute = self._dispute_by_id.get(dispute_id)
+            if dispute:
+                dispute.votes = list(
+                    self._votes_by_dispute.get(dispute_id, [])
+                )
+            return dispute
+
+    # PUBLIC_INTERFACE
+    def cast_vote(self, dispute_id: str, voter: str, choice: VoteChoice) -> VoteDTO:
+        """
+        Cast a peer review vote (ACCEPT/REJECT) on an open dispute.
+        Each voter may only vote once per dispute.
+        """
+        with self._lock:
+            dispute = self._dispute_by_id.get(dispute_id)
+            if not dispute or dispute.status != DisputeStatus.OPEN:
+                raise ValueError("Dispute not found or not open")
+            votes = self._votes_by_dispute.get(dispute_id, [])
+            if any(v.voter == voter for v in votes):
+                raise ValueError("Voter has already voted on this dispute")
+            vote = VoteDTO(
+                dispute_id=dispute_id,
+                voter=voter,
+                choice=choice,
+            )
+            votes.append(vote)
+            self._votes_by_dispute[dispute_id] = votes
+            dispute.votes = list(votes)
+            return vote
+
+    # PUBLIC_INTERFACE
+    def close_dispute_peer(
+        self, dispute_id: str, resolved_by: str, notes: Optional[str] = None
+    ) -> DisputeDTO:
+        """
+        Peer-based resolution: finalize dispute based on current vote tally.
+        Sets result (ACCEPT if majority of votes are ACCEPT, else REJECT).
+        """
+        with self._lock:
+            dispute = self._dispute_by_id.get(dispute_id)
+            if not dispute or dispute.status != DisputeStatus.OPEN:
+                raise ValueError("Dispute not found or not open")
+            votes = self._votes_by_dispute.get(dispute_id, [])
+            accept = sum(
+                1 for v in votes if v.choice == VoteChoice.ACCEPT
+            )
+            reject = sum(
+                1 for v in votes if v.choice == VoteChoice.REJECT
+            )
+            if accept == 0 and reject == 0:
+                raise ValueError("No votes cast yet")
+            result = (
+                VoteChoice.ACCEPT if accept > reject else VoteChoice.REJECT
+            )
+            dispute.status = DisputeStatus.RESOLVED
+            dispute.resolved_at = datetime.datetime.utcnow()
+            dispute.result = result
+            dispute.resolved_by = resolved_by
+            dispute.resolution_notes = notes
+            dispute.votes = list(votes)
+            return dispute
+
+    # PUBLIC_INTERFACE
+    def admin_override_dispute(
+        self, dispute_id: str, admin: str, accept: bool, notes: Optional[str] = None
+    ) -> DisputeDTO:
+        """
+        Admin resolves dispute regardless of votes. If accept=True, result is ACCEPT (bug is valid);
+        else REJECT (dispute succeeds, bug is rejected).
+        """
+        with self._lock:
+            dispute = self._dispute_by_id.get(dispute_id)
+            if not dispute or dispute.status != DisputeStatus.OPEN:
+                raise ValueError("Dispute not found or not open")
+            result = VoteChoice.ACCEPT if accept else VoteChoice.REJECT
+            dispute.status = DisputeStatus.ADMIN_OVERRIDE
+            dispute.resolved_at = datetime.datetime.utcnow()
+            dispute.resolved_by = admin
+            dispute.resolution_notes = notes
+            dispute.result = result
+            dispute.votes = list(
+                self._votes_by_dispute.get(dispute_id, [])
+            )
+            return dispute
+
+    # PUBLIC_INTERFACE
+    def list_votes_for_dispute(self, dispute_id: str) -> List[VoteDTO]:
+        """List all votes for a dispute (peer voting)."""
+        with self._lock:
+            return list(self._votes_by_dispute.get(dispute_id, []))
