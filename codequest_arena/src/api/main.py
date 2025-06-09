@@ -33,15 +33,48 @@ from .routes import analytics
 
 
 def get_settings() -> Dict[str, str]:
-    """Returns settings/config for theming and global config."""
+    """Returns settings/config for theming and global config (including glassy meta)."""
     # In the future, load from env file/config management
     return {
         "theme": "dark",
         "colors": {
             "primary": "#020d1d",
             "secondary": "#9CA3AF",
-            "accent": "#013951"
-        }
+            "accent": "#013951",
+            "background": "rgba(2,13,29,0.88)",
+            "card_bg": "rgba(21,30,48,0.47)",
+            "frost": "rgba(255,255,255,0.12)",
+            "highlight": "#00eaff",
+        },
+        "glass": {
+            "card_opacity": 0.47,
+            "frost_intensity": 8,
+            "border_radius": 20,
+            "shadow": "0 4px 32px 4px rgba(2,13,29,0.11)",
+            "blur_px": 18,
+            "border": "1.5px solid rgba(255,255,255,0.12)",
+        },
+        "neon": {
+            "hover_color": "#00eaff",
+            "active_color": "#26ffb8",
+        },
+        "dark_mode": True,
+        "layout": {
+            "card_spacing": 28,
+            "responsive_breakpoints": {
+                "sm": 540,
+                "md": 900,
+                "lg": 1200,
+            },
+        },
+        "meta": {
+            "design": "glassmorphism",
+            "animations": [
+                "frosted-fade",
+                "confetti",
+                "neon-pulse",
+            ],
+        },
     }
 
 
@@ -80,9 +113,28 @@ async def health_check():
 @app.get("/config/theme")
 async def get_theme_config():
     """
-    Retrieve global theming/config data (for frontend display/glassy effects, etc.).
+    Retrieve global theme + extended glassmorphism meta config for frontend frosted effects.
+    Returns theme, palette, card glass styles, neon configs, layout meta, and global meta info.
     """
     return get_settings()
+
+
+# PUBLIC_INTERFACE
+@app.get("/config/colors")
+async def get_color_palette():
+    """
+    Retrieve the color palette for the glassmorphism UI (frontend may use these for CSS variables).
+    """
+    return get_settings().get("colors", {})
+
+
+# PUBLIC_INTERFACE
+@app.get("/config/layout")
+async def get_layout_config():
+    """
+    Retrieve meta layout info for glassy dashboard—useful for card spacing, breakpoints, etc.
+    """
+    return get_settings().get("layout", {})
 
 
 # ----- Stubs for future modular routers -----
