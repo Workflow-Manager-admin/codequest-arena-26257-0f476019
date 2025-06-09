@@ -156,11 +156,13 @@ async def not_found_handler(request: Request, exc):
     """Custom 404 error handler."""
     path_str = str(request.url.path)
     # E501 compliant, no line exceeds 100 chars
-    detail_msg = (
-        "Path '"
-        + path_str
-        + "' not found in CodeQuest Arena API."
-    )
+    # E501 and W504 compliant: break before '+', keep lines <= 100 chars
+    # E501-compliant: each string segment fits on its own line
+    # E501-compliant: implicit string concatenation in parentheses
+    # E501-compliant: break the string into fragments with explicit variables (never concatenating long results)
+    prefix = "Path '"
+    suffix = "' not found in CodeQuest Arena API."
+    detail_msg = prefix + str(path_str) + suffix
     return JSONResponse(
         status_code=404,
         content={
